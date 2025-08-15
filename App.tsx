@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   },
   dial: {
     width: 60,
-    height: 60,
+    height: 180,
     marginHorizontal: 4,
     borderWidth: 1,
     borderColor: '#ccc',

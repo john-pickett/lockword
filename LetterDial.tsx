@@ -1,8 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View, NativeSyntheticEvent, NativeScrollEvent } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
 
 const LETTERS = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
 const ITEM_HEIGHT = 60;
+const VISIBLE_COUNT = 3;
+const EXTENDED_LETTERS = Array.from(
+  { length: LETTERS.length * 3 },
+  (_, i) => LETTERS[i % LETTERS.length],
+);
 
 interface Props {
   initialLetter?: string;
@@ -11,20 +23,35 @@ interface Props {
 
 export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
   const scrollRef = useRef<ScrollView>(null);
-  const [current, setCurrent] = useState(initialLetter.toUpperCase());
+  const startIndex =
+    LETTERS.indexOf(initialLetter.toUpperCase()) + LETTERS.length;
+  const [currentIndex, setCurrentIndex] = useState(startIndex);
 
   useEffect(() => {
-    const index = LETTERS.indexOf(current);
-    if (index >= 0) {
-      scrollRef.current?.scrollTo({ y: index * ITEM_HEIGHT, animated: false });
-    }
-  }, [current]);
+    scrollRef.current?.scrollTo({
+      y: startIndex * ITEM_HEIGHT,
+      animated: false,
+    });
+  }, [startIndex]);
+
+  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const index = Math.round(e.nativeEvent.contentOffset.y / ITEM_HEIGHT);
+    setCurrentIndex(index);
+  };
 
   const handleMomentumEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const index = Math.round(e.nativeEvent.contentOffset.y / ITEM_HEIGHT);
-    const letter = LETTERS[index] || 'A';
-    setCurrent(letter);
-    onChange?.(letter);
+    let index = Math.round(e.nativeEvent.contentOffset.y / ITEM_HEIGHT);
+    const mod = ((index % LETTERS.length) + LETTERS.length) % LETTERS.length;
+    const adjustedIndex = LETTERS.length + mod;
+    if (index !== adjustedIndex) {
+      scrollRef.current?.scrollTo({
+        y: adjustedIndex * ITEM_HEIGHT,
+        animated: false,
+      });
+      index = adjustedIndex;
+    }
+    setCurrentIndex(index);
+    onChange?.(LETTERS[mod]);
   };
 
   return (
@@ -34,13 +61,30 @@ export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
         showsVerticalScrollIndicator={false}
         snapToInterval={ITEM_HEIGHT}
         decelerationRate="fast"
+        onScroll={handleScroll}
         onMomentumScrollEnd={handleMomentumEnd}
+        scrollEventThrottle={16}
       >
-        {LETTERS.map((letter) => (
-          <View key={letter} style={styles.item}>
-            <Text style={styles.letter}>{letter}</Text>
-          </View>
-        ))}
+        {EXTENDED_LETTERS.map((letter, i) => {
+          const isCurrent = i === currentIndex;
+          const isAdjacent = i === currentIndex - 1 || i === currentIndex + 1;
+          return (
+            <View key={`${letter}-${i}`} style={styles.item}>
+              <Text
+                style={[
+                  styles.letter,
+                  isCurrent
+                    ? styles.selected
+                    : isAdjacent
+                    ? styles.adjacent
+                    : styles.hidden,
+                ]}
+              >
+                {letter}
+              </Text>
+            </View>
+          );
+        })}
       </ScrollView>
     </View>
   );
@@ -48,7 +92,7 @@ export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    height: ITEM_HEIGHT,
+    height: ITEM_HEIGHT * VISIBLE_COUNT,
     width: '100%',
     overflow: 'hidden',
   },
@@ -60,5 +104,15 @@ const styles = StyleSheet.create({
   letter: {
     fontSize: 32,
     fontWeight: 'bold',
+  },
+  selected: {
+    color: '#000',
+  },
+  adjacent: {
+    color: '#aaa',
+  },
+  hidden: {
+    color: '#000',
+    opacity: 0,
   },
 });
