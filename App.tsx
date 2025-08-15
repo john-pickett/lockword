@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, Button, ScrollView } from 'react-native';
 import LetterDial from './src/components/LetterDial';
 import { COMMON_FIVE_LETTER_WORDS } from './src/data/fiveLetterWords';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 export default function App() {
   const randomWord = useMemo(() => {
@@ -26,30 +27,35 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.wordsArea} contentContainerStyle={styles.wordsContent}>
-        <Text style={styles.randomWord}>{randomWord}</Text>
-        {words.map((word, i) => (
-          <Text key={`${word}-${i}`} style={styles.submittedWord}>
-            {word}
-          </Text>
-        ))}
-      </ScrollView>
-      <View style={styles.bottomArea}>
-        <View style={styles.row}>
-          {letters.map((letter, i) => (
-            <View key={i} style={styles.dial}>
-              <LetterDial
-                initialLetter={letter}
-                onChange={l => handleLetterChange(i, l)}
-              />
-            </View>
+    <SafeAreaProvider>
+      {/* Only apply the safe area to the top so content clears the notch/status bar */}
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <ScrollView style={styles.wordsArea} contentContainerStyle={styles.wordsContent}>
+          <Text style={styles.randomWord}>{randomWord}</Text>
+          {words.map((word, i) => (
+            <Text key={`${word}-${i}`} style={styles.submittedWord}>
+              {word}
+            </Text>
           ))}
+        </ScrollView>
+
+        <View style={styles.bottomArea}>
+          <View style={styles.row}>
+            {letters.map((letter, i) => (
+              <View key={i} style={styles.dial}>
+                <LetterDial
+                  initialLetter={letter}
+                  onChange={l => handleLetterChange(i, l)}
+                />
+              </View>
+            ))}
+          </View>
+          <Button title="Submit" onPress={handleSubmit} />
         </View>
-        <Button title="Submit" onPress={handleSubmit} />
-      </View>
-      <StatusBar style="auto" />
-    </View>
+
+        <StatusBar style="auto" />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
