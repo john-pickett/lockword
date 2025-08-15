@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
-import LetterDial from './LetterDial';
+import LetterDial from './src/components/LetterDial';
 
 export default function App() {
   const dials = Array.from({ length: 5 });
