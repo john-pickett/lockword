@@ -1,10 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import LetterDial from './LetterDial';
 
 export default function App() {
+  const dials = Array.from({ length: 5 });
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
+      <View style={styles.row}>
+        {dials.map((_, i) => (
+          <View key={i} style={styles.dial}>
+            <LetterDial />
+          </View>
+        ))}
+      </View>
       <StatusBar style="auto" />
     </View>
   );
@@ -16,5 +24,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  row: {
+    flexDirection: 'row',
+  },
+  dial: {
+    width: 60,
+    height: 60,
+    marginHorizontal: 4,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    overflow: 'hidden',
   },
 });
