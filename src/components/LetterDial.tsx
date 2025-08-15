@@ -28,23 +28,23 @@ export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
-      y: startIndex * ITEM_HEIGHT,
+      y: (startIndex - 1) * ITEM_HEIGHT,
       animated: false,
     });
   }, [startIndex]);
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const index = Math.round(e.nativeEvent.contentOffset.y / ITEM_HEIGHT);
+    const index = Math.round(e.nativeEvent.contentOffset.y / ITEM_HEIGHT) + 1;
     setCurrentIndex(index);
   };
 
   const handleMomentumEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    let index = Math.round(e.nativeEvent.contentOffset.y / ITEM_HEIGHT);
+    let index = Math.round(e.nativeEvent.contentOffset.y / ITEM_HEIGHT) + 1;
     const mod = ((index % LETTERS.length) + LETTERS.length) % LETTERS.length;
     const adjustedIndex = LETTERS.length + mod;
     if (index !== adjustedIndex) {
       scrollRef.current?.scrollTo({
-        y: adjustedIndex * ITEM_HEIGHT,
+        y: (adjustedIndex - 1) * ITEM_HEIGHT,
         animated: false,
       });
       index = adjustedIndex;
@@ -53,13 +53,8 @@ export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
     onChange?.(LETTERS[mod]);
   };
 
-  const normalizedIndex = ((currentIndex % LETTERS.length) + LETTERS.length) % LETTERS.length;
-  const prevLetter = LETTERS[(normalizedIndex - 1 + LETTERS.length) % LETTERS.length];
-  const nextLetter = LETTERS[(normalizedIndex + 1) % LETTERS.length];
-
   return (
     <View style={styles.wrapper}>
-      <Text style={[styles.letter, styles.adjacent]}>{prevLetter}</Text>
       <View style={styles.container}>
         <ScrollView
           ref={scrollRef}
@@ -70,14 +65,23 @@ export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
           onMomentumScrollEnd={handleMomentumEnd}
           scrollEventThrottle={16}
         >
-          {EXTENDED_LETTERS.map((letter, i) => (
-            <View key={`${letter}-${i}`} style={styles.item}>
-              <Text style={[styles.letter, styles.selected]}>{letter}</Text>
-            </View>
-          ))}
+          {EXTENDED_LETTERS.map((letter, i) => {
+            const isSelected = i === currentIndex;
+            return (
+              <View
+                key={`${letter}-${i}`}
+                style={[styles.item, isSelected && styles.selectedItem]}
+              >
+                <Text
+                  style={[styles.letter, isSelected ? styles.selected : styles.adjacent]}
+                >
+                  {letter}
+                </Text>
+              </View>
+            );
+          })}
         </ScrollView>
       </View>
-      <Text style={[styles.letter, styles.adjacent]}>{nextLetter}</Text>
     </View>
   );
 }
@@ -87,7 +91,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   container: {
-    height: ITEM_HEIGHT,
+    height: ITEM_HEIGHT * 3,
     width: '100%',
     overflow: 'hidden',
   },
@@ -95,6 +99,8 @@ const styles = StyleSheet.create({
     height: ITEM_HEIGHT,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  selectedItem: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 4,
@@ -104,10 +110,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   selected: {
-    
   },
   adjacent: {
     color: '#aaa',
-    marginVertical: 8,
   },
 });
