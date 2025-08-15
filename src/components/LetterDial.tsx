@@ -10,7 +10,6 @@ import {
 
 const LETTERS = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
 const ITEM_HEIGHT = 60;
-const VISIBLE_COUNT = 3;
 const EXTENDED_LETTERS = Array.from(
   { length: LETTERS.length * 3 },
   (_, i) => LETTERS[i % LETTERS.length],
@@ -54,45 +53,41 @@ export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
     onChange?.(LETTERS[mod]);
   };
 
+  const normalizedIndex = ((currentIndex % LETTERS.length) + LETTERS.length) % LETTERS.length;
+  const prevLetter = LETTERS[(normalizedIndex - 1 + LETTERS.length) % LETTERS.length];
+  const nextLetter = LETTERS[(normalizedIndex + 1) % LETTERS.length];
+
   return (
-    <View style={styles.container}>
-      <ScrollView
-        ref={scrollRef}
-        showsVerticalScrollIndicator={false}
-        snapToInterval={ITEM_HEIGHT}
-        decelerationRate="fast"
-        onScroll={handleScroll}
-        onMomentumScrollEnd={handleMomentumEnd}
-        scrollEventThrottle={16}
-      >
-        {EXTENDED_LETTERS.map((letter, i) => {
-          const isCurrent = i === currentIndex;
-          const isAdjacent = i === currentIndex - 1 || i === currentIndex + 1;
-          return (
+    <View style={styles.wrapper}>
+      <Text style={[styles.letter, styles.adjacent]}>{prevLetter}</Text>
+      <View style={styles.container}>
+        <ScrollView
+          ref={scrollRef}
+          showsVerticalScrollIndicator={false}
+          snapToInterval={ITEM_HEIGHT}
+          decelerationRate="fast"
+          onScroll={handleScroll}
+          onMomentumScrollEnd={handleMomentumEnd}
+          scrollEventThrottle={16}
+        >
+          {EXTENDED_LETTERS.map((letter, i) => (
             <View key={`${letter}-${i}`} style={styles.item}>
-              <Text
-                style={[
-                  styles.letter,
-                  isCurrent
-                    ? styles.selected
-                    : isAdjacent
-                    ? styles.adjacent
-                    : styles.hidden,
-                ]}
-              >
-                {letter}
-              </Text>
+              <Text style={styles.letter}>{letter}</Text>
             </View>
-          );
-        })}
-      </ScrollView>
+          ))}
+        </ScrollView>
+      </View>
+      <Text style={[styles.letter, styles.adjacent]}>{nextLetter}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    alignItems: 'center',
+  },
   container: {
-    height: ITEM_HEIGHT * VISIBLE_COUNT,
+    height: ITEM_HEIGHT,
     width: '100%',
     overflow: 'hidden',
   },
@@ -105,14 +100,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
   },
-  selected: {
-    color: '#000',
-  },
   adjacent: {
     color: '#aaa',
-  },
-  hidden: {
-    color: '#000',
-    opacity: 0,
   },
 });
