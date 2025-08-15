@@ -56,6 +56,7 @@ export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
   return (
     <View style={styles.wrapper}>
       <View style={styles.container}>
+        <View style={[styles.item, styles.selectedItem, { position: 'absolute', top: ITEM_HEIGHT, left: 0, right: 0, zIndex: 1, pointerEvents: 'none' }]} />
         <ScrollView
           ref={scrollRef}
           showsVerticalScrollIndicator={false}
@@ -69,14 +70,14 @@ export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
             const isSelected = i === currentIndex;
             return (
               <View
-                key={`${letter}-${i}`}
-                style={[styles.item, isSelected && styles.selectedItem]}
+          key={`${letter}-${i}`}
+          style={styles.item}
               >
-                <Text
-                  style={[styles.letter, isSelected ? styles.selected : styles.adjacent]}
-                >
-                  {letter}
-                </Text>
+          <Text
+            style={[styles.letter, isSelected ? styles.selected : styles.adjacent]}
+          >
+            {letter}
+          </Text>
               </View>
             );
           })}
