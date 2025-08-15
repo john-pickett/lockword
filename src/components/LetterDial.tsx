@@ -72,7 +72,7 @@ export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
         >
           {EXTENDED_LETTERS.map((letter, i) => (
             <View key={`${letter}-${i}`} style={styles.item}>
-              <Text style={styles.letter}>{letter}</Text>
+              <Text style={[styles.letter, styles.selected]}>{letter}</Text>
             </View>
           ))}
         </ScrollView>
@@ -95,12 +95,19 @@ const styles = StyleSheet.create({
     height: ITEM_HEIGHT,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
   },
   letter: {
     fontSize: 32,
     fontWeight: 'bold',
   },
+  selected: {
+    
+  },
   adjacent: {
     color: '#aaa',
+    marginVertical: 8,
   },
 });

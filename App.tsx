@@ -32,9 +32,6 @@ const styles = StyleSheet.create({
     width: 60,
     height: 180,
     marginHorizontal: 4,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
     overflow: 'hidden',
   },
 });
