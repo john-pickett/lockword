@@ -7,6 +7,7 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 
 const LETTERS = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
 const ITEM_HEIGHT = 60;
@@ -39,6 +40,8 @@ export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
   };
 
   const handleMomentumEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    // Vibration feedback on scroll
+    Haptics.selectionAsync();
     let index = Math.round(e.nativeEvent.contentOffset.y / ITEM_HEIGHT) + 1;
     const mod = ((index % LETTERS.length) + LETTERS.length) % LETTERS.length;
     const adjustedIndex = LETTERS.length + mod;
@@ -51,6 +54,7 @@ export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
     }
     setCurrentIndex(index);
     onChange?.(LETTERS[mod]);
+    
   };
 
   return (
@@ -62,7 +66,9 @@ export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
           showsVerticalScrollIndicator={false}
           snapToInterval={ITEM_HEIGHT}
           decelerationRate="fast"
-          onScroll={handleScroll}
+          onScroll={e => {
+            handleScroll(e); 
+          }}
           onMomentumScrollEnd={handleMomentumEnd}
           scrollEventThrottle={16}
         >
