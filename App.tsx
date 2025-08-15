@@ -1,15 +1,22 @@
+import React, { useMemo } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 import LetterDial from './src/components/LetterDial';
+import { COMMON_FIVE_LETTER_WORDS } from './src/data/fiveLetterWords';
 
 export default function App() {
-  const dials = Array.from({ length: 5 });
+  const randomWord = useMemo(() => {
+    const index = Math.floor(Math.random() * COMMON_FIVE_LETTER_WORDS.length);
+    return COMMON_FIVE_LETTER_WORDS[index].toUpperCase();
+  }, []);
+  const letters = randomWord.split('');
+
   return (
     <View style={styles.container}>
       <View style={styles.row}>
-        {dials.map((_, i) => (
+        {letters.map((letter, i) => (
           <View key={i} style={styles.dial}>
-            <LetterDial />
+            <LetterDial initialLetter={letter} />
           </View>
         ))}
       </View>
