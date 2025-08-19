@@ -1,3 +1,6 @@
+/**
+ * I believe this list was copied from Boss Word. Should be clean.
+ */
 export const COMMON_FIVE_LETTER_WORDS: string[] = [
   "about",
   "their",

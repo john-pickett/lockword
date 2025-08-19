@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, Button, ScrollView } from 'react-native';
 import LetterDial from './src/components/LetterDial';
-import { COMMON_FIVE_LETTER_WORDS } from './src/data/fiveLetterWords';
+import { COMMON_FIVE_LETTER_WORDS } from './src/data/commonFiveLetterWords';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 export default function App() {
