@@ -19,9 +19,14 @@ const EXTENDED_LETTERS = Array.from(
 interface Props {
   initialLetter?: string;
   onChange?: (letter: string) => void;
+  disabled?: boolean;
 }
 
-export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
+export default function LetterDial({
+  initialLetter = 'A',
+  onChange,
+  disabled = false,
+}: Props) {
   const scrollRef = useRef<ScrollView>(null);
   const startIndex =
     LETTERS.indexOf(initialLetter.toUpperCase()) + LETTERS.length;
@@ -32,6 +37,7 @@ export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
       y: (startIndex - 1) * ITEM_HEIGHT,
       animated: false,
     });
+    setCurrentIndex(startIndex);
   }, [startIndex]);
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -58,32 +64,46 @@ export default function LetterDial({ initialLetter = 'A', onChange }: Props) {
   };
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, disabled && styles.disabled]}>
       <View style={styles.container}>
-        <View style={[styles.item, styles.selectedItem, { position: 'absolute', top: ITEM_HEIGHT, left: 0, right: 0, zIndex: 1, pointerEvents: 'none' }]} />
+        <View
+          style={[
+            styles.item,
+            styles.selectedItem,
+            {
+              position: 'absolute',
+              top: ITEM_HEIGHT,
+              left: 0,
+              right: 0,
+              zIndex: 1,
+              pointerEvents: 'none',
+            },
+          ]}
+        />
         <ScrollView
           ref={scrollRef}
           showsVerticalScrollIndicator={false}
           snapToInterval={ITEM_HEIGHT}
           decelerationRate="fast"
           onScroll={e => {
-            handleScroll(e); 
+            handleScroll(e);
           }}
           onMomentumScrollEnd={handleMomentumEnd}
+          scrollEnabled={!disabled}
           scrollEventThrottle={16}
         >
           {EXTENDED_LETTERS.map((letter, i) => {
             const isSelected = i === currentIndex;
             return (
-              <View
-          key={`${letter}-${i}`}
-          style={styles.item}
-              >
-          <Text
-            style={[styles.letter, isSelected ? styles.selected : styles.adjacent]}
-          >
-            {letter}
-          </Text>
+              <View key={`${letter}-${i}`} style={styles.item}>
+                <Text
+                  style={[
+                    styles.letter,
+                    isSelected ? styles.selected : styles.adjacent,
+                  ]}
+                >
+                  {letter}
+                </Text>
               </View>
             );
           })}
@@ -120,5 +140,8 @@ const styles = StyleSheet.create({
   },
   adjacent: {
     color: '#aaa',
+  },
+  disabled: {
+    opacity: 0.3,
   },
 });

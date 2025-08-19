@@ -7,16 +7,21 @@ import { randomWordPairTwoStepsApart } from './src/utils/wordLadder';
 
 export default function App() {
   const { start, end } = useMemo(() => randomWordPairTwoStepsApart(), []);
+  const [baseLetters, setBaseLetters] = useState(() => start.split(''));
   const [letters, setLetters] = useState(() => start.split(''));
   const [words, setWords] = useState<string[]>([]);
   const [hasWon, setHasWon] = useState(false);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const handleLetterChange = (index: number, letter: string) => {
-    setLetters(prev => {
-      const updated = [...prev];
-      updated[index] = letter;
-      return updated;
-    });
+    const updated = [...letters];
+    updated[index] = letter;
+    setLetters(updated);
+    const diffs = updated.reduce<number[]>((acc, l, i) => {
+      if (l !== baseLetters[i]) acc.push(i);
+      return acc;
+    }, []);
+    setActiveIndex(diffs.length ? diffs[0] : null);
   };
 
   const handleSubmit = () => {
@@ -25,6 +30,13 @@ export default function App() {
     if (word === end) {
       setHasWon(true);
     }
+    setBaseLetters([...letters]);
+    setActiveIndex(null);
+  };
+
+  const handleReset = () => {
+    setLetters(baseLetters);
+    setActiveIndex(null);
   };
 
   return (
@@ -50,11 +62,16 @@ export default function App() {
                 <LetterDial
                   initialLetter={letter}
                   onChange={l => handleLetterChange(i, l)}
+                  disabled={activeIndex !== null && activeIndex !== i}
                 />
               </View>
             ))}
           </View>
-          <Button title="Submit" onPress={handleSubmit} />
+          <View style={styles.buttonRow}>
+            <Button title="Reset" onPress={handleReset} />
+            <View style={styles.buttonSpacer} />
+            <Button title="Submit" onPress={handleSubmit} />
+          </View>
         </View>
 
         <StatusBar style="auto" />
@@ -103,5 +120,13 @@ const styles = StyleSheet.create({
     height: 180,
     marginHorizontal: 4,
     overflow: 'hidden',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  buttonSpacer: {
+    width: 16,
   },
 });
