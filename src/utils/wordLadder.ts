@@ -58,3 +58,25 @@ export function stepsBetweenWords(start: string, end: string): number | null {
   return null;
 }
 
+/**
+ * Find a random pair of words where the second word is exactly two
+ * single-letter transformations away from the first word. Both words
+ * are drawn from `longFiveLetterWords`.
+ */
+export function randomWordPairTwoStepsApart(): { start: string; end: string } {
+  while (true) {
+    const startIndex = Math.floor(Math.random() * longFiveLetterWords.length);
+    const start = longFiveLetterWords[startIndex];
+
+    // Try a handful of random candidates until one is exactly two steps away
+    for (let i = 0; i < 1000; i++) {
+      const endIndex = Math.floor(Math.random() * longFiveLetterWords.length);
+      const end = longFiveLetterWords[endIndex];
+      if (stepsBetweenWords(start, end) === 2) {
+        return { start: start.toUpperCase(), end: end.toUpperCase() };
+      }
+    }
+    // If no candidate found after many attempts, pick a new start word
+  }
+}
+

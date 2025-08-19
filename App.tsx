@@ -2,16 +2,14 @@ import React, { useMemo, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, Button, ScrollView } from 'react-native';
 import LetterDial from './src/components/LetterDial';
-import { COMMON_FIVE_LETTER_WORDS } from './src/data/commonFiveLetterWords';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { randomWordPairTwoStepsApart } from './src/utils/wordLadder';
 
 export default function App() {
-  const randomWord = useMemo(() => {
-    const index = Math.floor(Math.random() * COMMON_FIVE_LETTER_WORDS.length);
-    return COMMON_FIVE_LETTER_WORDS[index].toUpperCase();
-  }, []);
-  const [letters, setLetters] = useState(() => randomWord.split(''));
+  const { start, end } = useMemo(() => randomWordPairTwoStepsApart(), []);
+  const [letters, setLetters] = useState(() => start.split(''));
   const [words, setWords] = useState<string[]>([]);
+  const [hasWon, setHasWon] = useState(false);
 
   const handleLetterChange = (index: number, letter: string) => {
     setLetters(prev => {
@@ -24,6 +22,9 @@ export default function App() {
   const handleSubmit = () => {
     const word = letters.join('');
     setWords(prev => [...prev, word]);
+    if (word === end) {
+      setHasWon(true);
+    }
   };
 
   return (
@@ -31,12 +32,15 @@ export default function App() {
       {/* Only apply the safe area to the top so content clears the notch/status bar */}
       <SafeAreaView style={styles.container} edges={['top']}>
         <ScrollView style={styles.wordsArea} contentContainerStyle={styles.wordsContent}>
-          <Text style={styles.randomWord}>{randomWord}</Text>
+          <Text style={styles.randomWord}>{start}</Text>
+          <Text style={styles.randomWord}>?????</Text>
+          <Text style={styles.randomWord}>{end}</Text>
           {words.map((word, i) => (
             <Text key={`${word}-${i}`} style={styles.submittedWord}>
               {word}
             </Text>
           ))}
+          {hasWon && <Text style={styles.winner}>You win!</Text>}
         </ScrollView>
 
         <View style={styles.bottomArea}>
@@ -79,6 +83,11 @@ const styles = StyleSheet.create({
   submittedWord: {
     fontSize: 24,
     marginTop: 8,
+  },
+  winner: {
+    fontSize: 32,
+    color: 'green',
+    marginTop: 16,
   },
   bottomArea: {
     flex: 1,
