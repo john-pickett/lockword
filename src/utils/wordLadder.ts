@@ -1,4 +1,5 @@
-import { longFiveLetterWords } from "../data/longFiveLetterWords";
+import { LONG_FIVE_LETTER_WORDS } from "../data/longFiveLetterWords";
+import { COMMON_FIVE_LETTER_WORDS } from "../data/commonFiveLetterWords";
 
 /**
  * Compute the minimum number of single-letter transformations required to
@@ -19,7 +20,7 @@ export function stepsBetweenWords(start: string, end: string): number | null {
     return 0;
   }
 
-  const dictionary = new Set(longFiveLetterWords.map((w) => w.toLowerCase()));
+  const dictionary = new Set(LONG_FIVE_LETTER_WORDS.map((w) => w.toLowerCase()));
   // Ensure start and end words are in the dictionary so they can be part of the path
   dictionary.add(normalizedStart);
   dictionary.add(normalizedEnd);
@@ -61,17 +62,17 @@ export function stepsBetweenWords(start: string, end: string): number | null {
 /**
  * Find a random pair of words where the second word is exactly two
  * single-letter transformations away from the first word. Both words
- * are drawn from `longFiveLetterWords`.
+ * are drawn from `COMMON_FIVE_LETTER_WORDS`.
  */
 export function randomWordPairTwoStepsApart(): { start: string; end: string } {
   while (true) {
-    const startIndex = Math.floor(Math.random() * longFiveLetterWords.length);
-    const start = longFiveLetterWords[startIndex];
+    const startIndex = Math.floor(Math.random() * COMMON_FIVE_LETTER_WORDS.length);
+    const start = COMMON_FIVE_LETTER_WORDS[startIndex];
 
     // Try a handful of random candidates until one is exactly two steps away
     for (let i = 0; i < 1000; i++) {
-      const endIndex = Math.floor(Math.random() * longFiveLetterWords.length);
-      const end = longFiveLetterWords[endIndex];
+      const endIndex = Math.floor(Math.random() * COMMON_FIVE_LETTER_WORDS.length);
+      const end = COMMON_FIVE_LETTER_WORDS[endIndex];
       if (stepsBetweenWords(start, end) === 2) {
         return { start: start.toUpperCase(), end: end.toUpperCase() };
       }

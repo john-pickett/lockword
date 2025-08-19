@@ -2,7 +2,7 @@
  * More or less complete list of 5 letter words in English
  * Has many swear words removed
  */
-export const longFiveLetterWords: string[] = [
+export const LONG_FIVE_LETTER_WORDS: string[] = [
   "aahed",
   "aalii",
   "aargh",
